@@ -4,6 +4,8 @@ import (
 	"testing"
 	"github.com/aws/aws-sdk-go/service/lightsail"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/jasonriedel/extractor/lib"
+	"github.com/jasonriedel/extractor/sources/aws-cloud/services"
 )
 
 
@@ -28,7 +30,7 @@ func TestSetupAwsSessions(t *testing.T) {
 
 func TestCollectLightSailInstances(t *testing.T) {
 
-	configuration, err := loadConfiguration(*fConfig)
+	configuration, err := lib.LoadConfiguration(*fConfig)
 	if err != nil {
 		t.Error("Unable to load the configuration file!")
 	}
@@ -39,9 +41,9 @@ func TestCollectLightSailInstances(t *testing.T) {
 
 	svc := lightsail.New(awsSession, &aws.Config{Region: aws.String(regions[0])})
 
-	collectedData := collectLightSailInstances(svc)
+	awsservices.CollectLightSailInstances(svc)
 
-	if collectedData == nil {
+	if lib.CollectedData == nil {
 		t.Error("Lightsail collected data is empty.")
 	}
 }
