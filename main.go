@@ -10,7 +10,9 @@ import (
 	"flag"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/op/go-logging"
-	"github.com/tuxninja/extractor/aws"
+	"github.com/jasonriedel/extractor/sources/aws-cloud/services"
+	"github.com/jasonriedel/extractor/lib"
+	"github.com/jasonriedel/extractor/sources/aws-cloud"
 )
 
 var wg sync.WaitGroup
@@ -49,10 +51,10 @@ func Collect(ch chan(ExtractionDetails), awsSessions map[string]*session.Session
 	awsSession := awsSessions[accountName]
 	svc := lightsail.New(awsSession, &aws.Config{Region: aws.String(region)})
 	msg := fmt.Sprintf("Collection Thread for %s, %s started", accountName, region)
-	log.Info(msg)
+	lib.Log.Info(msg)
 
-	CollectLightSailInstances(svc)
-	fmt.Println(CollectedData)
+	awsservices.CollectLightSailInstances(svc)
+	fmt.Println(lib.CollectedData)
 }
 
 
@@ -61,9 +63,9 @@ func setupAwsSessions(accountsMap map[string]string, regions []string) (map[stri
 	awsSessions := make(map[string]*session.Session, len(accountsMap))
 
 	for accountName := range accountsMap {
-		awsSession, err := createAwsSession(accountName)
+		awsSession, err := awscloud.CreateAwsSession(accountName)
 		if err != nil {
-			log.Critical(err)
+			lib.Log.Critical(err)
 		}
 
 		awsSessions[accountName] = awsSession
@@ -80,7 +82,7 @@ func getRegions() []string{
 
 	for _, p := range partitions {
 		//fmt.Println("Regions for", p.ID())
-		if p.ID() != "aws-cn" && p.ID() != "us-gov-1" {
+		if p.ID() != "aws-cloud-cn" && p.ID() != "us-gov-1" {
 			for id, _ := range p.Regions() {
 				regions = append(regions, id)
 			}
@@ -95,12 +97,12 @@ func main() {
 
 	//setup logging
 	extractorlog1 := logging.NewLogBackend(os.Stderr, "", 0)
-	extractorlog1Formatter := logging.NewBackendFormatter(extractorlog1, logFormat)
+	extractorlog1Formatter := logging.NewBackendFormatter(extractorlog1, lib.LogFormat)
 	logging.SetBackend(extractorlog1Formatter)
 
-	configuration, err := loadConfiguration(*fConfig)
+	configuration, err := lib.LoadConfiguration(*fConfig)
 	if err != nil {
-		log.Critical(err)
+		lib.Log.Critical(err)
 		os.Exit(1)
 	}
 

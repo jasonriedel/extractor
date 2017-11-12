@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"github.com/satori/go.uuid"
@@ -8,15 +8,15 @@ import (
 )
 
 //logging setup
-var log = logging.MustGetLogger("logger")
-var logFormat = logging.MustStringFormatter(
+var Log = logging.MustGetLogger("logger")
+var LogFormat = logging.MustStringFormatter(
 	`%{color}%{time:15:04:05.000} %{shortfunc} ▶ %{level:.4s} %{id:03x}%{color:reset} %{message}`,
 )
 
 //global
 var CollectedData = make(map[string]interface{})
 
-type Collection []interface {}
+type Collection []interface{}
 
 type Configuration struct {
 	Accounts map[string]string
@@ -26,11 +26,11 @@ func (c *Collection) StoreMap(uid string, data interface{}) {
 	CollectedData[uid] = data
 }
 
-func uuidHash(arn string) string {
+func UuidHash(arn string) string {
 	return uuid.NewV5(uuid.NamespaceOID, arn).String()
 }
 
-func loadConfiguration(path string) (config Configuration, err error) {
+func LoadConfiguration(path string) (config Configuration, err error) {
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		return
