@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/jasonriedel/extractor/lib"
 	"github.com/jasonriedel/extractor/sources/aws-cloud/services"
+	"github.com/jasonriedel/extractor/sources/aws-cloud"
 )
 
 
@@ -20,7 +21,7 @@ func TestSetupAwsSessions(t *testing.T) {
 	accountsMap := make(map[string]string)
 	accountsMap["tuxlabs"] = "907391580367"
 	regions := []string{"us-east-1"}
-	awsSessions := setupAwsSessions(accountsMap, regions)
+	awsSessions := awscloud.SetupAwsSessions(accountsMap, regions)
 
 	//not sure if this will ever return nil
 	if awsSessions == nil {
@@ -36,7 +37,7 @@ func TestCollectLightSailInstances(t *testing.T) {
 	}
 
 	regions := []string{"us-east-1"}
-	awsSessions := setupAwsSessions(configuration.Accounts, regions)
+	awsSessions := awscloud.SetupAwsSessions(configuration.Accounts, regions)
 	awsSession := awsSessions["tuxlabs"]
 
 	svc := lightsail.New(awsSession, &aws.Config{Region: aws.String(regions[0])})

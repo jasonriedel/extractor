@@ -58,22 +58,6 @@ func Collect(ch chan(ExtractionDetails), awsSessions map[string]*session.Session
 }
 
 
-
-func setupAwsSessions(accountsMap map[string]string, regions []string) (map[string]*session.Session) {
-	awsSessions := make(map[string]*session.Session, len(accountsMap))
-
-	for accountName := range accountsMap {
-		awsSession, err := awscloud.CreateAwsSession(accountName)
-		if err != nil {
-			lib.Log.Critical(err)
-		}
-
-		awsSessions[accountName] = awsSession
-	}
-	return awsSessions
-}
-
-
 func getRegions() []string{
 	var regions []string
 
@@ -107,7 +91,7 @@ func main() {
 	}
 
 	regions := getRegions()
-	awsSessions := setupAwsSessions(configuration.Accounts, regions)
+	awsSessions := awscloud.SetupAwsSessions(configuration.Accounts, regions)
 
 	ch, awsSessions := createChannelData(awsSessions, configuration.Accounts, regions)
 
